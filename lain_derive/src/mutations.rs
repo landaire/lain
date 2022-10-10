@@ -271,13 +271,16 @@ fn mutatable_enum_visitor(variants: &[Variant], cont_ident: &syn::Ident) -> Vec<
 fn mutatable_struct_visitor(fields: &[Field]) -> Vec<TokenStream> {
     fields
         .iter()
-        .map(|field| {
+        .filter_map(|field| {
+            if field.attrs.ignore() {
+                return None;
+            }
             let (_field_ident, _field_ident_string, initializer) =
                 field_mutator(field, "self.", false);
 
-            quote! {
+            Some(quote! {
                 #initializer
-            }
+            })
         })
         .collect()
 }

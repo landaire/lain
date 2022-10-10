@@ -169,7 +169,7 @@ mod test {
 
     #[test]
     fn test_ignored_fields() {
-        #[derive(NewFuzzed, BinarySerialize, Clone)]
+        #[derive(NewFuzzed, BinarySerialize, Clone, Mutatable)]
         struct IgnoredFieldsStruct {
             #[lain(ignore)]
             ignored: u8,
@@ -177,8 +177,11 @@ mod test {
 
         let mut mutator = get_mutator();
 
-        let initialized_struct = IgnoredFieldsStruct::new_fuzzed(&mut mutator, None);
+        let mut initialized_struct = IgnoredFieldsStruct::new_fuzzed(&mut mutator, None);
 
+        assert_eq!(initialized_struct.ignored, 0);
+
+        initialized_struct.mutate(&mut mutator, None);
         assert_eq!(initialized_struct.ignored, 0);
     }
 
